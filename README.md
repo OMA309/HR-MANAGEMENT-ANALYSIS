@@ -168,53 +168,70 @@ from hr_dat
 where date(termdate) < current_date()
 group by race;
 ```
+### Age Distribution in the Company
+- Distribution of employee ages.
+```SQL
+select Age__group, 
+count(*) Frequency ,
+concat(round((select count(Age__group)/(select count(*) from hh_dat)*100),1),'%') percent 
+from hr_dat
+group by Age__group;
+```
 
+### Employee Hire Counts Over Time
+- Trends in employee hiring over time.
+```SQL
+ select hire_date,
+ year(hire_date) hire_year,
+count(hire_date) frequency,
+concat(round((select count(hire_date)/(select count(*) from hr_dat)*100),1),'%') percent 
+from hr_dat
+group by hire_year
+order by hire_year asc;
+```
 
+### Tenure Distribution by Department
+- Analysis of employee tenure across different departments.
+```SQL
+select department,
+	sum(case when datediff(termdate,hire_date) is null then 1
+	when datediff(termdate,hire_date)< 365 then 1 
+    	else 0
+    	end) as '<1 year',
+	sum(case when datediff(termdate,hire_date) between 365 and 1825 then 1
+	else 0
+	end) as '1-5years',
+	sum(case when datediff(termdate,hire_date) between 1826 and 3650 then 1
+	else 0 
+	end ) as '5-10years',
+	sum(case when datediff(termdate,hire_date)>=3651 then 1
+	else 0
+	end) as '11 years+'
+	from hr_dat
+	group by department;
+```
+### Average Length of Employment
+- Calculation of the average length of employment in the company.
+```SQL
+select round(avg(datediff(curdate(),hire_date)/365),1) Avg_emp from hr_dat;
+```
 
-Age Distribution in the Company
+### Department with the Highest Turnover Rate
+- Identification of the department with the highest employee turnover rate.
+```SQL
+select department,hire_date, 
+(select count(id) from hr_dat where year(hire_date) <='2020')TOTAL_HIRE,
+(select count(id) from hr_dat where date(termdate) < current_date())LEFTT,
+CONCAT(ROUND((select count(id) from hr_dat where date(termdate) < current_date()) /
+(select ROUND(count(id)/2,1) from hr_dat where year(hire_date) <='2020')*100,1),'%') COMPANY_TURNOVER,
+CONCAT(ROUND((select count(id)) /
+(select ROUND(count(id)/2,1) from hr_dat where year(hire_date) <='2020')*100,1),'%')DEPARTMENT_RATE from hr_dat
+where date(termdate) < current_date()
+group by department;
+```
 
-Distribution of employee ages.
-sql
-Copy code
-SELECT DATEDIFF(year, birthdate, GETDATE()) AS age, COUNT(*) AS count
-FROM employees
-GROUP BY age;
-Employee Hire Counts Over Time
-
-Trends in employee hiring over time.
-sql
-Copy code
-SELECT YEAR(hire_date) AS hire_year, COUNT(*) AS count
-FROM employees
-GROUP BY hire_year;
-Tenure Distribution by Department
-
-Analysis of employee tenure across different departments.
-sql
-Copy code
-SELECT department, AVG(DATEDIFF(day, hire_date, ISNULL(termdate, GETDATE()))) AS avg_tenure
-FROM employees
-GROUP BY department;
-Average Length of Employment
-
-Calculation of the average length of employment in the company.
-sql
-Copy code
-SELECT AVG(DATEDIFF(day, hire_date, ISNULL(termdate, GETDATE()))) AS avg_tenure
-FROM employees;
-Department with the Highest Turnover Rate
-
-Identification of the department with the highest employee turnover rate.
-sql
-Copy code
-SELECT department, COUNT(*) AS turnover_count
-FROM employees
-WHERE termdate IS NOT NULL
-GROUP BY department
-ORDER BY turnover_count DESC
-LIMIT 1;
-5. Visualizations
-Key visualizations created in Power BI include:
+### Visualizations
+- Key visualizations created in Power BI include:
 
 Gender Breakdown:
 
@@ -242,21 +259,13 @@ Average Length of Employment:
 
 Department with the Highest Turnover Rate:
 
-6. Insights and Recommendations
+### Insights and Recommendations
 Key Insights:
+-
 
-Gender Breakdown: The gender distribution is relatively balanced, with a slight majority of male employees.
-Remote Work: Certain departments have a higher number of remote workers, indicating a potential need for better remote work policies.
-Race Distribution: The company has a diverse racial composition, but certain races are underrepresented.
-Employee Terminations: The highest number of terminations occur in specific departments, highlighting potential areas for HR intervention.
-Tenure Distribution: Some departments have higher tenure, indicating job satisfaction and stability.
-Recommendations:
-
-Enhance Remote Work Policies: Develop and implement comprehensive remote work policies to support departments with high remote work participation.
-Diversity and Inclusion Programs: Launch initiatives to address racial underrepresentation and promote diversity.
-Employee Retention Strategies: Focus on departments with high turnover rates by investigating underlying causes and implementing retention strategies.
-Long-term Employee Recognition: Recognize and reward long-serving employees to promote job satisfaction and loyalty.
-7. Conclusion
+### Recommendations:
+-
+### Conclusion
 The HR management analysis has provided valuable insights into employee demographics, work distribution, and employment patterns. By implementing the recommended strategies, the company can improve employee satisfaction, retention rates, and overall HR processes. Continuous monitoring and analysis are essential to sustain these improvements.
   
 
