@@ -259,8 +259,8 @@ Average Length of Employment:
 
 Department with the Highest Turnover Rate:
 
-### Insights and Recommendations
-Key Insights:
+## Insights and Recommendations
+### Key Insights:
 -
 
 ### Recommendations:
